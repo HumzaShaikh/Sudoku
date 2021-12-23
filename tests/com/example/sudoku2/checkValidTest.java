@@ -137,7 +137,7 @@ public class checkValidTest {
                 {8, 9, 1, 2, 3, 4, 5, 6, 7},
                 {3, 4, 5, 6, 7, 8, 9, 1, 2},
                 {6, 7, 8, 9, 1, 2, 3, 4, 5},
-                {9, 1, 2, 3, 4, 5, 6, 7, 1},
+                {9, 1, 2, 3, 4, 5, 6, 7, 1}
         };
         test(third, false, 3);
 
@@ -154,4 +154,44 @@ public class checkValidTest {
         };
         test(fourth, true, 4);
     }
+
+    @Test
+    public void integrationMakeBoard() {
+        int[][] first = {
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+        };
+        Board boardTemp = new Board(first, Difficulty.EASY);
+        int[][] curr = boardTemp.board;
+        Board.print(curr);
+        String str = Board.stringFromIntArr(curr);
+        int[][] act = Board.intArrFromString(str);
+        Board.print(act);
+        test(act, true, 1);
+
+        int[][] second = {
+                {1, 2, 3, 4, 5, 6, 7, 8, 9},
+                {4, 5, 6, 7, 8, 9, 1, 2, 3},
+                {7, 8, 9, 1, 2, 3, 4, 5, 6},
+                {2, 3, 4, 5, 6, 7, 8, 9, 1},
+                {5, 6, 7, 8, 9, 1, 2, 3, 4},
+                {8, 9, 1, 2, 3, 4, 5, 6, 7},
+                {3, 4, 5, 6, 7, 8, 9, 1, 2},
+                {6, 7, 8, 9, 1, 2, 3, 4, 5},
+                {9, 1, 2, 3, 4, 5, 6, 7, 1}
+        };
+        boardTemp = new Board(second, Difficulty.EASY);
+        curr = boardTemp.board;
+        str = Board.stringFromIntArr(curr);
+        act = Board.intArrFromString(str);
+        test(act, false, 2);
+    }
+
 }

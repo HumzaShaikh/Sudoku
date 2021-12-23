@@ -2,6 +2,10 @@ package com.example.sudoku2;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+
+import static org.junit.jupiter.api.Assertions.*;
+
 public class placeValTest {
 
     int[][] base = {
@@ -17,14 +21,100 @@ public class placeValTest {
     };
 
 
-    public void test(int val, int x, int y, int[][] board, int[][] expected, int curr) {
-        Board B = new Board(board, Difficulty.EASY);
-        boolean check;
-        B.placeVal(val, x, y);
+    public void test(int val, int x, int y, Board board, int[][] expArr, boolean expCheck, int curr) {
+        int[][] actArr = board.board;
+        boolean actCheck = false;
+        if (board.placeVal(val,x,y)) {
+            if (Arrays.deepEquals(expArr, actArr)) {
+                actCheck = true;
+            }
+        }
+        assertEquals(expCheck, actCheck, "Expected " +
+                Arrays.deepToString(expArr) + " but got " + Arrays.deepToString(actArr) +
+                " on case " + curr);
+
     }
 
     @Test
     public void simple() {
+        Board boardBase = new Board(base, Difficulty.EASY);
+        int[][] exp1 = {
+                        {1, 0, 0, 0, 0, 0, 0, 0, 0},
+                        {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                        {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                        {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                        {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                        {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                        {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                        {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                        {0, 0, 0, 0, 0, 0, 0, 0, 0},
+        };
+        test(1,0,0,boardBase,exp1,true,1);
 
+        int[][] exp2 = {
+                {1, 2, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+        };
+        test(2,1,0,boardBase,exp2,true,2);
+
+        int[][] exp3 = {
+                {1, 2, 0, 0, 0, 0, 0, 0, 0},
+                {3, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+        };
+        test(3,0,1,boardBase,exp3,true,3);
+
+        int[][] exp4 = {
+                {1, 2, 0, 0, 0, 0, 0, 0, 0},
+                {3, 1, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+        };
+        test(1,1,1,boardBase,exp4,false,4);
+
+        test(0,0,7,boardBase,exp3,true,5);
+
+        int[][] exp5 = {
+                {1, 2, 0, 0, 0, 0, 0, 0, 1},
+                {3, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+        };
+        int[][] exp6 = {
+                {1, 2, 0, 0, 0, 0, 0, 0, 0},
+                {3, 0, 0, 0, 0, 0, 0, 1, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0},
+        };
+        test(1,8,0,boardBase,exp5,false,6);
+        test(1,7,1,boardBase,exp6,true,7);
     }
 }
