@@ -64,6 +64,7 @@ public class Board {
             } else {
                 return false;
             }
+
         }
         return true;
     }
