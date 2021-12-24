@@ -14,53 +14,70 @@ public class Board {
         this.Difficulty = difficulty;
     }
 
-    public boolean placeVal(int val, int y, int x) {
-        int temp = this.board[x][y];
-        this.board[x][y] = val;
-        if (!checkValid(x,y)) {
-            this.board[x][y] = temp;
-            return false;
+    public boolean placeVal(int val, int row, int col) {
+        if (val == 0) {
+            this.board[row][col] = 0;
+            return true;
         }
-        return true;
+        if (checkValid(val,row,col)) {
+            this.board[row][col] = val;
+            return true;
+        }
+        return false;
     }
 
-    public boolean checkValid(int x, int y) {
+    public boolean checkValid(int val, int row, int col) {
         if (board.length != 9) return false;
-        if (board[x][y] < 0 || board[x][y] > 9) return false;
-        return row(x) && col(y) && subsec(x,y);
-
+        if (board[row][col] < 0 || board[row][col] > 9) return false;
+        return row(val, row) && col(val, col) && subsec(val, row,col);
     }
-    private boolean row(int x) {
-        boolean[] constraint = new boolean[9];
-        return IntStream.range(0,9).allMatch(column -> checkConstraint(x, column, constraint));
-    }
-
-    private boolean col(int y) {
-        boolean[] constraint = new boolean[9];
-        return IntStream.range(0,9).allMatch(row -> checkConstraint(y, row, constraint));
-    }
-
-    private boolean subsec(int x, int y) {
-        boolean[] constraint = new boolean[9];
-        int subsectionRowStart = (y / 3) * 3;
-        int subsectionRowEnd = subsectionRowStart + 3;
-
-        int subsectionColStart = (x / 3) * 3;
-        int subsectionColEnd = subsectionColStart + 3;
-
-        for (int r = subsectionRowStart; r < subsectionRowEnd; r++) {
-            for (int c = subsectionColStart; c < subsectionColEnd; c++) {
-                if (!checkConstraint(r,c,constraint)) return false;
+    private boolean row(int num, int row) {
+        if (num == 0) return true;
+        for(int i = 0; i < 0; i++) {
+            if (board[row][i] == num) {
+                System.out.printf("Row false");
+                return false;
             }
         }
         return true;
     }
 
-    boolean checkConstraint(int y, int x, boolean[] constraint) {
+    private boolean col(int num, int col) {
+        if (num == 0) return true;
+        for(int i = 0; i < 9; i++) {
+            if (board[i][col] == num) {
+                System.out.printf("Col false: " + num );
+                return false;
+            }
+        }
+        return true;
+
+    }
+
+    private boolean subsec(int val, int row, int col) {
+        if (val == 0) return true;
+        int subsectionRowStart = (row / 3) * 3;
+        int subsectionRowEnd = subsectionRowStart + 3;
+
+        int subsectionColStart = (col / 3) * 3;
+        int subsectionColEnd = subsectionColStart + 3;
+
+        for (int r = subsectionRowStart; r < subsectionRowEnd; r++) {
+            for (int c = subsectionColStart; c < subsectionColEnd; c++) {
+                if (board[r][c] == val) {
+                    System.out.println("Subsec false");
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    boolean checkConstraint(int row, int col, boolean[] constraint) {
         int[] nums = {1,2,3,4,5,6,7,8,9};
-        if (board [x][y] < 10 && board[x][y] > 0) {
-            if (!constraint[board[x][y] - 1]) {
-                constraint[board[x][y] - 1] = true;
+        if (board [row][col] < 10 && board[row][col] > 0) {
+            if (!constraint[board[row][col] - 1]) {
+                constraint[board[row][col] - 1] = true;
             } else {
                 return false;
             }
@@ -110,7 +127,7 @@ public class Board {
 
     }
 
-    public static void print(int[][] arr) {
+    public static String print(int[][] arr) {
         String initBord = "=============================\n";
         String midBord = "-----------------------------";
         String temp = initBord;
@@ -133,6 +150,8 @@ public class Board {
                 else if (col % 3 == 0) System.out.println(midBord);
             }
             System.out.println(temp);
+            return "";
         }
+        return "";
     }
 }

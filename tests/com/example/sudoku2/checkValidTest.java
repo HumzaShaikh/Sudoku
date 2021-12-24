@@ -9,9 +9,11 @@ public class checkValidTest {
     private void test(int[][] base, boolean expected , int curr) {
         Board board = new Board(base, Difficulty.EASY);
         boolean check = true;
-        for(int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                if (!board.checkValid(i,j)) check = false;
+        for (int tempVal = 1; tempVal < 10; tempVal++) {
+            for (int i = 0; i < 8; i++) {
+                for (int j = 0; j < 8; j++) {
+                    if (!board.checkValid(tempVal, i, j)) check = false;
+                }
             }
         }
         assertEquals(expected, check,
