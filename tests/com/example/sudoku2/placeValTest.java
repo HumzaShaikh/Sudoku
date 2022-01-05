@@ -1,5 +1,6 @@
 package com.example.sudoku2;
 
+/*
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -178,3 +179,4 @@ public class placeValTest {
 
     }
 }
+ */

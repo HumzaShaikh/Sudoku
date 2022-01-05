@@ -7,54 +7,73 @@ import java.util.stream.IntStream;
 public class Board {
     public int[][] board;
     public Difficulty Difficulty;
-
+    public boolean[][] checks = (new boolean[9][9]);
 
     Board(int[][] init, Difficulty difficulty) {
         this.board = init;
         this.Difficulty = difficulty;
+        for (boolean[] curr: checks
+             ) {
+            Arrays.fill(curr,true);
+        }
     }
 
+    /*
     public boolean placeVal(int val, int row, int col) {
         if (val == 0) {
             this.board[row][col] = 0;
             return true;
         }
-        if (checkValid(val,row,col)) {
+        if (checkValid()) {
             this.board[row][col] = val;
             return true;
         }
         return false;
     }
+     */
 
-    public boolean checkValid(int val, int row, int col) {
-        if (board.length != 9) return false;
-        if (board[row][col] < 0 || board[row][col] > 9) return false;
-        return row(val, row) && col(val, col) && subsec(val, row,col);
+    public void checkValid() {
+
+        for (int row = 0; row < 9; row++) {
+            for (int col = 0; col < 9; col++) {
+                int curr = board[row][col];
+
+
+
+                checks[row][col] = curr >= 0 && curr <= 9 && row(curr,row,col) && col(curr,row,col) && subsec(curr,row,col);
+            }
+        }
     }
-    private boolean row(int num, int row) {
+
+
+    private boolean row(int num, int row, int col) {
+        //System.out.println(num);
         if (num == 0) return true;
-        for(int i = 0; i < 0; i++) {
-            if (board[row][i] == num) {
-                System.out.printf("Row false");
+        //System.out.println(Arrays.toString(board[row]));
+        for(int i = 0; i < 9; i++) {
+           // System.out.println("current ting: " + board[row][i]);
+
+            if (board[row][i] == num && i != col) {
+              System.out.printf("\nRow false " + row + " with num: " + num);
                 return false;
             }
         }
         return true;
     }
 
-    private boolean col(int num, int col) {
+    private boolean col(int num, int row, int col) {
         if (num == 0) return true;
         for(int i = 0; i < 9; i++) {
-            if (board[i][col] == num) {
-                System.out.printf("Col false: " + num );
+            if (board[i][col] == num && i != row) {
+                System.out.printf("\nCol false: " + col + " with num: " + num );
                 return false;
             }
         }
         return true;
-
     }
 
     private boolean subsec(int val, int row, int col) {
+
         if (val == 0) return true;
         int subsectionRowStart = (row / 3) * 3;
         int subsectionRowEnd = subsectionRowStart + 3;
@@ -64,8 +83,8 @@ public class Board {
 
         for (int r = subsectionRowStart; r < subsectionRowEnd; r++) {
             for (int c = subsectionColStart; c < subsectionColEnd; c++) {
-                if (board[r][c] == val) {
-                    System.out.println("Subsec false");
+                if (board[r][c] == val && r != row && c != col) {
+                  System.out.println("\nSubsec false with col: " + col + " and row: " + row + " for num: " + val);
                     return false;
                 }
             }
