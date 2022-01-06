@@ -31,6 +31,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -57,6 +58,7 @@ public class Sudoku extends Application {
     int indexCol;
     int indexRow;
     Node[][] cells = new Node[9][9];
+    boolean confirm = false;
 
 
     public void makeMenu() {
@@ -226,7 +228,8 @@ public class Sudoku extends Application {
 
 
     public void makeGame(Difficulty difficulty) {
-        this.currentBoard = new Board(new Game(difficulty).mat,difficulty);
+        Game game = new Game(difficulty);
+        this.currentBoard = new Board(game,difficulty);
         controls.getChildren().clear();
         GridPane gameGrid = new GridPane();
         PseudoClass right = PseudoClass.getPseudoClass("right");
@@ -332,10 +335,12 @@ public class Sudoku extends Application {
 
 
 
-        Button checkButton = makeCheckButton();
-        checkButton.setLayoutX(570);
-        checkButton.setLayoutY(100);
-        BOARD.getChildren().addAll(gameGrid, checkButton);
+        VBox gameControls = new VBox();
+        gameControls.setSpacing(35);
+        gameControls.getChildren().addAll(makeClearButton(),makeCheckButton(),makeSolveButton());
+        gameControls.setLayoutX(570);
+        gameControls.setLayoutY(100);
+        BOARD.getChildren().addAll(gameGrid, gameControls);
 
     }
 
@@ -401,6 +406,8 @@ public class Sudoku extends Application {
                 "-fx-border-width: 3px;");
 
         button.setOnAction(actionEvent -> {
+            confirm = false;
+            prompts.getChildren().clear();
             int[][] nums = new int[9][9];
             for(int i = 0; i < 9; i++) {
                 for (int j = 0; j < 9; j++) {
@@ -420,19 +427,28 @@ public class Sudoku extends Application {
             System.out.println(Arrays.deepToString(nums));
             currentBoard.checkValid();
             printArr();
+            boolean check = true;
             for (int row = 0; row < 9; row++) {
                 for (int col = 0; col < 9; col++) {
                     if (!currentBoard.checks[row][col] && cells[row][col].getClass() == TextField.class) {
-
+                        check = false;
                         cells[row][col].getParent().setStyle("-fx-border-radius: 9px;" +
                                 "-fx-background-radius: 9px;" +
                                 "-fx-background-color: NONE;" +
                                 "-fx-border-color: #e36588;" +
                                 "-fx-border-width: 2px");
+                    } else if (cells[row][col].getClass() == TextField.class) {
+                        if (((TextField) cells[row][col]).getText().isEmpty()) {
+
+                            check = false;
+                        }
                     }
                 }
             }
+            if (check) {
+                finishSequence();
 
+            }
         });
         button.addEventHandler(MouseEvent.MOUSE_ENTERED,
                 e -> {
@@ -445,7 +461,7 @@ public class Sudoku extends Application {
 
         button.addEventHandler(MouseEvent.MOUSE_EXITED,
                 e -> {
-                    prompts.getChildren().clear();
+
                     button.setStyle("-fx-background-color: NONE;-fx-background-radius: 19px; -fx-text-fill: #4a483f;" +
                             "-fx-border-color: #4a483f;" +
                             "-fx-border-width: 3px");
@@ -486,6 +502,128 @@ public class Sudoku extends Application {
 
         //rtn.setStyle("-fx-background-color: NONE; -fx-text-fill: BLACK; -fx-border-color: BLACK");
         return rtn;
+    }
+
+    Button makeClearButton() {
+        Button button = new Button("Clear");
+        Label confirmText = new Label("Click again to confirm");
+        confirmText.setFont(Font.font("Times new roman",FontWeight.NORMAL,16));
+        confirmText.setLayoutY(78);
+        confirmText.setLayoutX(572);
+        button.setOnAction(actionEvent -> {
+            if (confirm) {
+                confirm = false;
+                controls.getChildren().remove(confirmText);
+                for (int row = 0; row < 9; row++) {
+                    for (int col = 0; col < 9; col++) {
+
+                        if (cells[row][col].getClass() == TextField.class) {
+                            cells[row][col].getParent().setStyle("-fx-background-color: #F9EDDC;" +
+                                    "-fx-background-radius: 9px;" +
+                                    "-fx-border-color: #4a483f;" +
+                                    "-fx-border-radius: 9px;" +
+                                    "-fx-border-width: 2px");
+                            ((TextField) cells[row][col]).setText("");
+                        }
+                    }
+                }
+
+            } else {
+                confirm = true;
+                prompts.getChildren().add(confirmText);
+            }
+        });
+        button.setFont(Font.font("Times new roman", FontWeight.SEMI_BOLD, 28));
+        button.setPrefWidth(150);
+        button.setStyle("-fx-background-color: NONE; -fx-background-radius: 19px; -fx-text-fill: #4a483f;" +
+                "-fx-border-color: #4a483f;" +
+                "-fx-border-width: 3px;");
+
+        button.addEventHandler(MouseEvent.MOUSE_ENTERED,
+                e -> {
+                    button.setStyle("-fx-background-color: #f0d3a8;" +
+                            "-fx-text-fill: #4a483f; " +
+                            "-fx-border-color: #4a483f;" +
+                            "-fx-border-width: 3px;");
+                    button.setEffect(new DropShadow());
+                });
+
+        button.addEventHandler(MouseEvent.MOUSE_EXITED,
+                e -> {
+            prompts.getChildren().clear();
+            confirm = false;
+                    button.setStyle("-fx-background-color: NONE;-fx-background-radius: 19px; -fx-text-fill: #4a483f;" +
+                            "-fx-border-color: #4a483f;" +
+                            "-fx-border-width: 3px");
+                    button.setEffect(null);
+                });
+
+        return button;
+    }
+
+    Button makeSolveButton() {
+        int[][] sol = currentBoard.solution;
+        System.out.println("solve button: " + Arrays.deepToString(sol));
+        Button button = new Button("Solve");
+        Label confirmText = new Label("Click again to confirm");
+        confirmText.setFont(Font.font("Times new roman",FontWeight.NORMAL,16));
+        confirmText.setLayoutY(258);
+        confirmText.setLayoutX(572);
+        button.setOnAction(actionEvent -> {
+            if (confirm) {
+                prompts.getChildren().clear();
+                for (int row = 0; row < 9; row++) {
+                    for (int col = 0; col < 9; col++) {
+                        if (cells[row][col].getClass() == TextField.class) {
+                            ((TextField) cells[row][col]).setText("" + sol[row][col]);
+                        }
+                    }
+                }
+            } else {
+                confirm = true;
+                prompts.getChildren().add(confirmText);
+            }
+
+        });
+        button.setFont(Font.font("Times new roman", FontWeight.SEMI_BOLD, 28));
+        button.setPrefWidth(150);
+        button.setStyle("-fx-background-color: NONE; -fx-background-radius: 19px; -fx-text-fill: #4a483f;" +
+                "-fx-border-color: #4a483f;" +
+                "-fx-border-width: 3px;");
+
+        button.addEventHandler(MouseEvent.MOUSE_ENTERED,
+                e -> {
+                    button.setStyle("-fx-background-color: #f0d3a8;" +
+                            "-fx-text-fill: #4a483f; " +
+                            "-fx-border-color: #4a483f;" +
+                            "-fx-border-width: 3px;");
+                    button.setEffect(new DropShadow());
+                });
+
+        button.addEventHandler(MouseEvent.MOUSE_EXITED,
+                e -> {
+                    prompts.getChildren().clear();
+                    confirm = false;
+                    button.setStyle("-fx-background-color: NONE;-fx-background-radius: 19px; -fx-text-fill: #4a483f;" +
+                            "-fx-border-color: #4a483f;" +
+                            "-fx-border-width: 3px");
+                    button.setEffect(null);
+                });
+
+        return button;
+
+    }
+
+    void finishSequence() {
+        for (int row = 0; row < 9; row++) {
+            for (int col = 0; col < 9; col++) {
+                cells[row][col].getParent().setStyle("-fx-border-radius: 9px;" +
+                        "-fx-background-radius: 9px;" +
+                        "-fx-background-color: NONE;" +
+                        "-fx-border-color: #3EE049;" +
+                        "-fx-border-width: 2px");
+            }
+        }
     }
 
 

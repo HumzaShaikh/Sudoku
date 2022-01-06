@@ -5,12 +5,15 @@ import java.util.Arrays;
 import java.util.stream.IntStream;
 
 public class Board {
+    public int[][] solution;
     public int[][] board;
     public Difficulty Difficulty;
     public boolean[][] checks = (new boolean[9][9]);
 
-    Board(int[][] init, Difficulty difficulty) {
-        this.board = init;
+    Board(Game game, Difficulty difficulty) {
+        this.board = game.mat;
+        this.solution = game.solution;
+        System.out.println("in board init: " + Arrays.deepToString(this.solution));
         this.Difficulty = difficulty;
         for (boolean[] curr: checks
              ) {

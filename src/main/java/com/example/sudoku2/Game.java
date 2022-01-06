@@ -1,7 +1,10 @@
 package com.example.sudoku2;
 
+import java.util.Arrays;
+
 public class Game {
 
+    int[][] solution = new int[9][9];
     int[] mat[];
     int N = 9;
     int SRN = 3;
@@ -31,6 +34,7 @@ public class Game {
     public void fillValues() {
         fillDiagonal();
         fillRemaining(0,3);
+
         removeKDigits();
     }
 
@@ -143,6 +147,13 @@ public class Game {
 
     public void removeKDigits()
     {
+        for (int row = 0; row < 9; row++) {
+            for (int col = 0; col < 9; col++) {
+                solution[row][col] = mat[row][col];
+            }
+        }
+
+        System.out.println("in remove k digits: " + Arrays.deepToString(solution));
         int count = K;
         while (count != 0)
         {
@@ -159,6 +170,7 @@ public class Game {
                 mat[i][j] = 0;
             }
         }
+        System.out.println("after remove k digits: " + Arrays.deepToString(solution));
     }
 
 
