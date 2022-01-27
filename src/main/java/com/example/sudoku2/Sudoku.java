@@ -11,8 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.effect.DropShadow;
-import javafx.scene.effect.Glow;
+import javafx.scene.effect.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -33,6 +32,7 @@ import javafx.util.Duration;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Objects;
 
 public class Sudoku extends Application {
 
@@ -68,9 +68,7 @@ public class Sudoku extends Application {
         startButton.setStyle("-fx-background-color: NONE; -fx-background-radius: 19px; -fx-text-fill: #4a483f;" +
                 "-fx-border-color: #F4DFC0;" +
                 "-fx-border-width: 4px;");
-        startButton.setOnAction(actionEvent -> {
-            difficultyMenu();
-        });
+        startButton.setOnAction(actionEvent -> difficultyMenu());
 
         VBox menuElems = new VBox(title,subtitle,startButton);
         menuElems.setAlignment(Pos.CENTER);
@@ -129,8 +127,10 @@ public class Sudoku extends Application {
     void diffButtonGraphics(Button button, Difficulty difficulty) {
 
         if (difficulty == Difficulty.CUSTOM) {
-            Label instructions = new Label("Place the numbers 1 - 9 in the boxes \nsuch" +
-                    " that all columns, rows and subsections \ncontain only one instance of each digit.");
+            Label instructions = new Label("""
+                    Place the numbers 1 - 9 in the boxes\s
+                    such that all columns, rows and subsections\s
+                    contain only one instance of each digit.""");
             instructions.setFont(Font.font("Times new roman",FontWeight.NORMAL,20));
 
             instructions.setLayoutX(195);
@@ -146,9 +146,7 @@ public class Sudoku extends Application {
 
             });
         } else {
-            button.setOnAction(actionEvent -> {
-                makeGame(difficulty, true);
-            });
+            button.setOnAction(actionEvent -> makeGame(difficulty, true));
         }
 
         button.setFont(Font.font("Times new roman", FontWeight.SEMI_BOLD, 34));
@@ -158,12 +156,10 @@ public class Sudoku extends Application {
                 "-fx-border-width: 4px;");
 
         button.addEventHandler(MouseEvent.MOUSE_ENTERED,
-                e -> {
-            button.setStyle("-fx-background-color: NONE;" +
-                    "-fx-text-fill: #4a483f; " +
-                    "-fx-border-color: #4a483f;" +
-                    "-fx-border-width: 4px;");
-                });
+                e -> button.setStyle("-fx-background-color: NONE;" +
+                        "-fx-text-fill: #4a483f; " +
+                        "-fx-border-color: #4a483f;" +
+                        "-fx-border-width: 4px;"));
 
         button.addEventHandler(MouseEvent.MOUSE_EXITED,
                 e -> {
@@ -178,8 +174,8 @@ public class Sudoku extends Application {
         Node source = (Node) event.getSource();
         GridPane gameGrid = (GridPane) source.getParent().getParent();
         Node node = source.getScene().getFocusOwner();
-        Integer col = indexCol;
-        Integer row = indexRow;
+        int col = indexCol;
+        int row = indexRow;
 
         if (col == 0 || row == 0) return;
         if (cells[indexRow-1][indexCol-1].getClass() == Label.class) cells[indexRow-1][indexCol-1].setEffect(null);
@@ -367,10 +363,11 @@ public class Sudoku extends Application {
         long endTime3 = System.nanoTime();
         HBox gameControls = new HBox();
         gameControls.setSpacing(35);
-        gameControls.getChildren().addAll(makeClearButton(difficulty),makeCheckButton(),makeSolveButton(),makeReturnButton());
+        gameControls.getChildren().addAll(makeClearButton(difficulty),makeCheckButton(),makeSolveButton());
         gameControls.setLayoutX(113);
         gameControls.setLayoutY(695);
-        BOARD.getChildren().addAll(gameControls, Vlines, HLines, gameGrid);
+        controls.getChildren().add(gameControls);
+        BOARD.getChildren().addAll(Vlines, HLines, gameGrid, makeReturnButton());
 
     }
 
@@ -384,18 +381,15 @@ public class Sudoku extends Application {
 
 
                     Integer boxColMin = (((targetIndexCol - 1) / 3) * 3) + 1;
-                    Integer boxColMax = boxColMin + 2;
+                    int boxColMax = boxColMin + 2;
 
                     Integer boxRowMin = (((targetIndexRow - 1) / 3) * 3) + 1;
-                    Integer boxRowMax = boxRowMin + 2;
+                    int boxRowMax = boxRowMin + 2;
 
                     Integer cCol = GridPane.getColumnIndex(c);
                     Integer cRow = GridPane.getRowIndex(c);
                     boolean check = (cCol >= boxColMin && cCol <= boxColMax && cRow >= boxRowMin && cRow <= boxRowMax);
-                    if (currentBoard.checks[targetIndexRow - 1][targetIndexCol - 1]) {
-
-                    }
-                    if (cCol == targetIndexCol || cRow == targetIndexRow || check) {
+                    if (cCol.equals(targetIndexCol) || Objects.equals(cRow, targetIndexRow) || check) {
                         c.setStyle("-fx-border-radius: 9px;" +
                                 "-fx-background-radius: 9px;" +
                                 "-fx-background-color: NONE;" +
@@ -406,15 +400,15 @@ public class Sudoku extends Application {
                 node.setOnMouseExited(e -> gameGrid.getChildren().forEach(c -> {
 
                     Integer boxColMin = (((targetIndexCol - 1) / 3) * 3) + 1;
-                    Integer boxColMax = boxColMin + 2;
+                    int boxColMax = boxColMin + 2;
 
                     Integer boxRowMin = (((targetIndexRow - 1) / 3) * 3) + 1;
-                    Integer boxRowMax = boxRowMin + 2;
+                    int boxRowMax = boxRowMin + 2;
 
                     Integer cCol = GridPane.getColumnIndex(c);
                     Integer cRow = GridPane.getRowIndex(c);
                     boolean check = (cCol >= boxColMin && cCol <= boxColMax && cRow >= boxRowMin && cRow <= boxRowMax);
-                    if (cCol == targetIndexCol || cRow == targetIndexRow || check) {
+                    if (cCol.equals(targetIndexCol) || Objects.equals(cRow, targetIndexRow) || check) {
                         c.setStyle("-fx-border-radius: 9px;" +
                                 "-fx-background-radius: 9px;" +
                                 "-fx-background-color: NONE;" +
@@ -431,7 +425,7 @@ public class Sudoku extends Application {
         Button button = new Button("Check");
         button.setFont(Font.font("Times new roman", FontWeight.SEMI_BOLD, 28));
         button.setPrefWidth(150);
-        button.setStyle("-fx-background-color: NONE; -fx-background-radius: 19px; -fx-text-fill: #4a483f;" +
+        button.setStyle("-fx-background-color: NONE; -fx-text-fill: #4a483f;" +
                 "-fx-border-color: #4a483f;" +
                 "-fx-border-width: 3px;");
 
@@ -443,7 +437,7 @@ public class Sudoku extends Application {
                 for (int j = 0; j < 9; j++) {
                     Node currentNode = cells[i][j];
                     if (currentNode.getClass() == TextField.class) {
-                        if (((TextField) currentNode).getText() != "") {
+                        if (!Objects.equals(((TextField) currentNode).getText(), "")) {
                             int curr = Character.getNumericValue(((TextField) currentNode).getText().charAt(0));
                             nums[i][j] = curr;
                         } else nums[i][j] = 0;
@@ -484,14 +478,15 @@ public class Sudoku extends Application {
                     button.setStyle("-fx-background-color: #f0d3a8;" +
                             "-fx-text-fill: #4a483f; " +
                             "-fx-border-color: #4a483f;" +
-                            "-fx-border-width: 3px;");
+                            "-fx-border-width: 3px;" +
+                            "-fx-background-insets: 2px");
                     button.setEffect(new DropShadow());
                 });
 
         button.addEventHandler(MouseEvent.MOUSE_EXITED,
                 e -> {
 
-                    button.setStyle("-fx-background-color: NONE;-fx-background-radius: 19px; -fx-text-fill: #4a483f;" +
+                    button.setStyle("-fx-background-color: NONE; -fx-text-fill: #4a483f;" +
                             "-fx-border-color: #4a483f;" +
                             "-fx-border-width: 3px");
                     button.setEffect(null);
@@ -576,7 +571,7 @@ public class Sudoku extends Application {
         });
         button.setFont(Font.font("Times new roman", FontWeight.SEMI_BOLD, 28));
         button.setPrefWidth(150);
-        button.setStyle("-fx-background-color: NONE; -fx-background-radius: 19px; -fx-text-fill: #4a483f;" +
+        button.setStyle("-fx-background-color: NONE; -fx-text-fill: #4a483f;" +
                 "-fx-border-color: #4a483f;" +
                 "-fx-border-width: 3px;");
 
@@ -585,7 +580,8 @@ public class Sudoku extends Application {
                     button.setStyle("-fx-background-color: #f0d3a8;" +
                             "-fx-text-fill: #4a483f; " +
                             "-fx-border-color: #4a483f;" +
-                            "-fx-border-width: 3px;");
+                            "-fx-border-width: 3px;" +
+                            "-fx-background-insets: 2px");
                     button.setEffect(new DropShadow());
                 });
 
@@ -593,7 +589,7 @@ public class Sudoku extends Application {
                 e -> {
             prompts.getChildren().clear();
             confirm = false;
-                    button.setStyle("-fx-background-color: NONE;-fx-background-radius: 19px; -fx-text-fill: #4a483f;" +
+                    button.setStyle("-fx-background-color: NONE; -fx-text-fill: #4a483f;" +
                             "-fx-border-color: #4a483f;" +
                             "-fx-border-width: 3px");
                     button.setEffect(null);
@@ -630,7 +626,7 @@ public class Sudoku extends Application {
         });
         button.setFont(Font.font("Times new roman", FontWeight.SEMI_BOLD, 28));
         button.setPrefWidth(150);
-        button.setStyle("-fx-background-color: NONE; -fx-background-radius: 19px; -fx-text-fill: #4a483f;" +
+        button.setStyle("-fx-background-color: NONE; -fx-text-fill: #4a483f;" +
                 "-fx-border-color: #4a483f;" +
                 "-fx-border-width: 3px;");
 
@@ -639,7 +635,8 @@ public class Sudoku extends Application {
                     button.setStyle("-fx-background-color: #f0d3a8;" +
                             "-fx-text-fill: #4a483f; " +
                             "-fx-border-color: #4a483f;" +
-                            "-fx-border-width: 3px;");
+                            "-fx-border-width: 3px;" +
+                            "-fx-background-insets: 2px");
                     button.setEffect(new DropShadow());
                 });
 
@@ -647,7 +644,7 @@ public class Sudoku extends Application {
                 e -> {
                     prompts.getChildren().clear();
                     confirm = false;
-                    button.setStyle("-fx-background-color: NONE;-fx-background-radius: 19px; -fx-text-fill: #4a483f;" +
+                    button.setStyle("-fx-background-color: NONE; -fx-text-fill: #4a483f;" +
                             "-fx-border-color: #4a483f;" +
                             "-fx-border-width: 3px");
                     button.setEffect(null);
@@ -659,31 +656,41 @@ public class Sudoku extends Application {
 
     Button makeReturnButton() {
 
-        FileInputStream input = null;
-        try {
-            input = new FileInputStream("src/main/resources/backArrow.png");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        Image image = new Image(input);
-        ImageView imageView = new ImageView(image);
-        imageView.setFitHeight(30);
-        imageView.setFitWidth(30);
 
-        Button rtn = new Button("", imageView);
-        rtn.lookup(".arrow");
+        Button rtn = new Button("Menu");
+        rtn.setFont(Font.font("Times new roman", FontWeight.SEMI_BOLD, 13));
+        rtn.setLayoutX(20);
+        rtn.setLayoutY(752.5);
         rtn.setOnAction(actionEvent -> {
             BOARD.getChildren().clear();
             prompts.getChildren().clear();
             controls.getChildren().clear();
             difficultyMenu();
         });
-        rtn.setStyle("-fx-background-color: NONE; -fx-text-fill: #4a483f");
+        rtn.setStyle("-fx-background-color: NONE; -fx-text-fill: #4a483f;" +
+                "-fx-border-color: #4a483f;" +
+                "-fx-border-width: 2px;");
+
+        rtn.setOnMouseEntered(e -> {
+            rtn.setStyle("-fx-background-color: #f0d3a8;" +
+                    "-fx-text-fill: #4a483f; " +
+                    "-fx-border-color: #4a483f;" +
+                    "-fx-border-width: 2px;" +
+                    "-fx-background-insets: 1px");
+           rtn.setEffect(new DropShadow());
+        });
+        rtn.setOnMouseExited(e -> {
+            rtn.setStyle("-fx-background-color: NONE; -fx-text-fill: #4a483f;" +
+                    "-fx-border-color: #4a483f;" +
+                    "-fx-border-width: 2px");
+            rtn.setEffect(null);
+        });
         return rtn;
     }
 
     void finishSequence(boolean skipped) {
         finished = true;
+        controls.getChildren().clear();
         for (int row = 0; row < 9; row++) {
             for (int col = 0; col < 9; col++) {
                 Node parent = cells[row][col].getParent();
@@ -699,27 +706,21 @@ public class Sudoku extends Application {
                     node.setEffect(null);
                     node.setFocusTraversable(false);
                 }
-                parent.setOnMouseEntered(e -> {
-                    parent.setStyle("-fx-border-radius: 9px;" +
-                            "-fx-background-radius: 9px;" +
-                            "-fx-background-color: NONE;" +
-                            "-fx-border-color: #3EE049;" +
-                            "-fx-border-width: 2px");
-                });
-                parent.setOnMouseExited(e -> {
-                    parent.setStyle("-fx-border-radius: 9px;" +
-                            "-fx-background-radius: 9px;" +
-                            "-fx-background-color: NONE;" +
-                            "-fx-border-color: #3EE049;" +
-                            "-fx-border-width: 2px");
-                });
+                parent.setOnMouseEntered(e -> parent.setStyle("-fx-border-radius: 9px;" +
+                        "-fx-background-radius: 9px;" +
+                        "-fx-background-color: NONE;" +
+                        "-fx-border-color: #3EE049;" +
+                        "-fx-border-width: 2px"));
+                parent.setOnMouseExited(e -> parent.setStyle("-fx-border-radius: 9px;" +
+                        "-fx-background-radius: 9px;" +
+                        "-fx-background-color: NONE;" +
+                        "-fx-border-color: #3EE049;" +
+                        "-fx-border-width: 2px"));
             }
         }
         Label congrats = new Label("Congratulations");
         Button playAgain = new Button("Play Again");
-        playAgain.setOnAction(actionEvent -> {
-            makeGame(currentBoard.Difficulty, true);
-        });
+        playAgain.setOnAction(actionEvent -> makeGame(currentBoard.Difficulty, true));
         prompts.getChildren().addAll(congrats,playAgain);
     }
 
@@ -727,7 +728,7 @@ public class Sudoku extends Application {
 
 
     @Override
-    public void start(Stage stage) throws IOException {
+    public void start(Stage stage) {
         difficultyMenu();
         root.getChildren().addAll(mainMenu,controls, prompts, BOARD);
         FXMLLoader fxmlLoader = new FXMLLoader(Sudoku.class.getResource("hello-view.fxml"));
