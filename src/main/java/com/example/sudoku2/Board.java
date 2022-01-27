@@ -13,7 +13,7 @@ public class Board {
     Board(Game game, Difficulty difficulty) {
         this.board = game.mat;
         this.solution = game.solution;
-        System.out.println("in board init: " + Arrays.deepToString(this.solution));
+        //System.out.println("in board init: " + Arrays.deepToString(this.solution));
         this.Difficulty = difficulty;
         for (boolean[] curr: checks
              ) {

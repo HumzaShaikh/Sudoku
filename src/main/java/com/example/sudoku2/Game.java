@@ -153,7 +153,7 @@ public class Game {
             }
         }
 
-        System.out.println("in remove k digits: " + Arrays.deepToString(solution));
+        //System.out.println("in remove k digits: " + Arrays.deepToString(solution));
         int count = K;
         while (count != 0)
         {
@@ -170,7 +170,7 @@ public class Game {
                 mat[i][j] = 0;
             }
         }
-        System.out.println("after remove k digits: " + Arrays.deepToString(solution));
+        //System.out.println("after remove k digits: " + Arrays.deepToString(solution));
     }
 
 
