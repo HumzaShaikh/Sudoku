@@ -3,7 +3,6 @@ package com.example.sudoku2;
 import javafx.animation.FadeTransition;
 import javafx.animation.Timeline;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -11,9 +10,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.effect.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.effect.Glow;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -29,18 +27,13 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Objects;
 
 public class Sudoku extends Application {
 
     Board currentBoard;
-    Font myFont = Font.loadFont("resources/futura_font.zip", 16);
     Group root = new Group();
     Group BOARD = new Group();
-    Group grid = new Group();
     Group mainMenu = new Group();
     Group controls = new Group();
     Group prompts = new Group();
@@ -51,29 +44,6 @@ public class Sudoku extends Application {
     Node[][] cells = new Node[9][9];
     boolean confirm = false;
 
-
-    public void makeMenu() {
-        Label title = new Label("Sudoku");
-        title.setFont(Font.font("Times new roman", FontWeight.SEMI_BOLD, 50));
-        title.setUnderline(true);
-        title.setStyle("-fx-text-fill: #4a483f");
-
-        Label subtitle = new Label("Made by Humza Shaikh");
-        subtitle.setFont(Font.font("Times new roman",FontWeight.SEMI_BOLD,25));
-
-
-        Button startButton = new Button("Start");
-        startButton.setFont(Font.font("Times new roman", FontWeight.SEMI_BOLD, 34));
-        startButton.setPrefWidth(250);
-        startButton.setStyle("-fx-background-color: NONE; -fx-background-radius: 19px; -fx-text-fill: #4a483f;" +
-                "-fx-border-color: #F4DFC0;" +
-                "-fx-border-width: 4px;");
-        startButton.setOnAction(actionEvent -> difficultyMenu());
-
-        VBox menuElems = new VBox(title,subtitle,startButton);
-        menuElems.setAlignment(Pos.CENTER);
-        mainMenu.getChildren().addAll(menuElems);
-    }
 
     public void difficultyMenu() {
 
@@ -171,9 +141,6 @@ public class Sudoku extends Application {
     }
 
     void handleArrowNavigation(KeyEvent event) {
-        Node source = (Node) event.getSource();
-        GridPane gameGrid = (GridPane) source.getParent().getParent();
-        Node node = source.getScene().getFocusOwner();
         int col = indexCol;
         int row = indexRow;
 
@@ -221,6 +188,7 @@ public class Sudoku extends Application {
             Game game = new Game(difficulty);
             this.currentBoard = new Board(game,difficulty);
         }
+        finished = false;
         BOARD.getChildren().clear();
         controls.getChildren().clear();
         GridPane gameGrid = new GridPane();
@@ -360,14 +328,14 @@ public class Sudoku extends Application {
         System.out.println(endTime1 - startTime);
         System.out.println(endTime2 - startTime);
 
-        long endTime3 = System.nanoTime();
         HBox gameControls = new HBox();
-        gameControls.setSpacing(35);
+        gameControls.setSpacing(40);
         gameControls.getChildren().addAll(makeClearButton(difficulty),makeCheckButton(),makeSolveButton());
-        gameControls.setLayoutX(113);
+        gameControls.setLayoutX(112);
         gameControls.setLayoutY(695);
-        controls.getChildren().add(gameControls);
-        BOARD.getChildren().addAll(Vlines, HLines, gameGrid, makeReturnButton());
+
+        controls.getChildren().addAll(gameControls, makeReturnButton());
+        BOARD.getChildren().addAll(Vlines, HLines, gameGrid);
 
     }
 
@@ -470,7 +438,7 @@ public class Sudoku extends Application {
                 }
             }
             if (check) {
-                finishSequence(false);
+                finishSequence();
             }
         });
         button.addEventHandler(MouseEvent.MOUSE_ENTERED,
@@ -527,37 +495,8 @@ public class Sudoku extends Application {
         Label confirmText = new Label("Click again to confirm");
         confirmText.setFont(Font.font("Times new roman",FontWeight.NORMAL,16));
         confirmText.setLayoutY(672);
-        confirmText.setLayoutX(116);
+        confirmText.setLayoutX(114.2);
         button.setOnAction(actionEvent -> {
-            /*if (confirm) {
-                confirm = false;
-                controls.getChildren().remove(confirmText);
-                for (int row = 0; row < 9; row++) {
-                    for (int col = 0; col < 9; col++) {
-
-                        if (cells[row][col].getClass() == TextField.class) {
-                            cells[row][col].getParent().setStyle("-fx-background-color: #F9EDDC;" +
-                                    "-fx-background-radius: 9px;" +
-                                    "-fx-border-color: #4a483f;" +
-                                    "-fx-border-radius: 9px;" +
-                                    "-fx-border-width: 2px");
-                            ((TextField) cells[row][col]).setText("");
-                        } else {
-                            cells[row][col].getParent().setStyle("-fx-border-radius: 9px;" +
-                                    "-fx-background-radius: 9px;" +
-                                    "-fx-background-color: NONE;" +
-                                    "-fx-border-color: #4a483f;" +
-                                    "-fx-border-width: 2px");
-                        }
-                    }
-                }
-
-            } else {
-                confirm = true;
-                prompts.getChildren().add(confirmText);
-            }
-
-             */
 
             if (confirm) {
                 confirm = false;
@@ -571,29 +510,7 @@ public class Sudoku extends Application {
         });
         button.setFont(Font.font("Times new roman", FontWeight.SEMI_BOLD, 28));
         button.setPrefWidth(150);
-        button.setStyle("-fx-background-color: NONE; -fx-text-fill: #4a483f;" +
-                "-fx-border-color: #4a483f;" +
-                "-fx-border-width: 3px;");
-
-        button.addEventHandler(MouseEvent.MOUSE_ENTERED,
-                e -> {
-                    button.setStyle("-fx-background-color: #f0d3a8;" +
-                            "-fx-text-fill: #4a483f; " +
-                            "-fx-border-color: #4a483f;" +
-                            "-fx-border-width: 3px;" +
-                            "-fx-background-insets: 2px");
-                    button.setEffect(new DropShadow());
-                });
-
-        button.addEventHandler(MouseEvent.MOUSE_EXITED,
-                e -> {
-            prompts.getChildren().clear();
-            confirm = false;
-                    button.setStyle("-fx-background-color: NONE; -fx-text-fill: #4a483f;" +
-                            "-fx-border-color: #4a483f;" +
-                            "-fx-border-width: 3px");
-                    button.setEffect(null);
-                });
+        buttonGraphics(button);
 
         return button;
     }
@@ -605,7 +522,7 @@ public class Sudoku extends Application {
         Label confirmText = new Label("Click again to confirm");
         confirmText.setFont(Font.font("Times new roman",FontWeight.NORMAL,16));
         confirmText.setLayoutY(672);
-        confirmText.setLayoutX(487);
+        confirmText.setLayoutX(495);
         button.setOnAction(actionEvent -> {
             if (confirm) {
                 prompts.getChildren().clear();
@@ -616,7 +533,7 @@ public class Sudoku extends Application {
                         }
                     }
                 }
-                finishSequence(true);
+                finishSequence();
             } else {
                 confirm = true;
                 prompts.getChildren().add(confirmText);
@@ -626,29 +543,7 @@ public class Sudoku extends Application {
         });
         button.setFont(Font.font("Times new roman", FontWeight.SEMI_BOLD, 28));
         button.setPrefWidth(150);
-        button.setStyle("-fx-background-color: NONE; -fx-text-fill: #4a483f;" +
-                "-fx-border-color: #4a483f;" +
-                "-fx-border-width: 3px;");
-
-        button.addEventHandler(MouseEvent.MOUSE_ENTERED,
-                e -> {
-                    button.setStyle("-fx-background-color: #f0d3a8;" +
-                            "-fx-text-fill: #4a483f; " +
-                            "-fx-border-color: #4a483f;" +
-                            "-fx-border-width: 3px;" +
-                            "-fx-background-insets: 2px");
-                    button.setEffect(new DropShadow());
-                });
-
-        button.addEventHandler(MouseEvent.MOUSE_EXITED,
-                e -> {
-                    prompts.getChildren().clear();
-                    confirm = false;
-                    button.setStyle("-fx-background-color: NONE; -fx-text-fill: #4a483f;" +
-                            "-fx-border-color: #4a483f;" +
-                            "-fx-border-width: 3px");
-                    button.setEffect(null);
-                });
+        buttonGraphics(button);
 
         return button;
 
@@ -688,7 +583,34 @@ public class Sudoku extends Application {
         return rtn;
     }
 
-    void finishSequence(boolean skipped) {
+
+    private void buttonGraphics(Button button) {
+        button.setStyle("-fx-background-color: NONE; -fx-text-fill: #4a483f;" +
+                "-fx-border-color: #4a483f;" +
+                "-fx-border-width: 3px;");
+
+        button.addEventHandler(MouseEvent.MOUSE_ENTERED,
+                e -> {
+                    button.setStyle("-fx-background-color: #f0d3a8;" +
+                            "-fx-text-fill: #4a483f; " +
+                            "-fx-border-color: #4a483f;" +
+                            "-fx-border-width: 3px;" +
+                            "-fx-background-insets: 2px");
+                    button.setEffect(new DropShadow());
+                });
+
+        button.addEventHandler(MouseEvent.MOUSE_EXITED,
+                e -> {
+                    prompts.getChildren().clear();
+                    confirm = false;
+                    button.setStyle("-fx-background-color: NONE; -fx-text-fill: #4a483f;" +
+                            "-fx-border-color: #4a483f;" +
+                            "-fx-border-width: 3px");
+                    button.setEffect(null);
+                });
+    }
+
+    void finishSequence() {
         finished = true;
         controls.getChildren().clear();
         for (int row = 0; row < 9; row++) {
@@ -718,10 +640,31 @@ public class Sudoku extends Application {
                         "-fx-border-width: 2px"));
             }
         }
-        Label congrats = new Label("Congratulations");
+
+
+
         Button playAgain = new Button("Play Again");
         playAgain.setOnAction(actionEvent -> makeGame(currentBoard.Difficulty, true));
-        prompts.getChildren().addAll(congrats,playAgain);
+        playAgain.setFont(Font.font("Times new roman", FontWeight.SEMI_BOLD, 28));
+        buttonGraphics(playAgain);
+        playAgain.setLayoutX(410);
+        playAgain.setLayoutY(695);
+        playAgain.setPrefWidth(170);
+
+        Button menuButton = new Button("Menu");
+        menuButton.setOnAction(actionEvent -> {
+            BOARD.getChildren().clear();
+            prompts.getChildren().clear();
+            controls.getChildren().clear();
+            difficultyMenu();
+        });
+        menuButton.setFont(Font.font("Times new roman", FontWeight.SEMI_BOLD, 28));
+        buttonGraphics(menuButton);
+        menuButton.setPrefWidth(170);
+        menuButton.setLayoutY(695);
+        menuButton.setLayoutX(165);
+
+        controls.getChildren().addAll(playAgain, menuButton);
     }
 
 
@@ -731,7 +674,6 @@ public class Sudoku extends Application {
     public void start(Stage stage) {
         difficultyMenu();
         root.getChildren().addAll(mainMenu,controls, prompts, BOARD);
-        FXMLLoader fxmlLoader = new FXMLLoader(Sudoku.class.getResource("hello-view.fxml"));
         Scene scene = new Scene(root, 750, 800);
         scene.setFill(Color.web("#F4DFC0"));
         stage.setTitle("Sudoku");
